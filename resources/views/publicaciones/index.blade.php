@@ -279,6 +279,32 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(err => console.error(err));
         });
     });
+    
+  document.querySelectorAll('.share-form').forEach(form => {
+        form.addEventListener('submit', function(e){
+            e.preventDefault();
+            const url = this.dataset.url;
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(resp => resp.json())
+            .then(data => {
+                // Actualiza el contador de compartidos
+                const span = this.querySelector('span');
+                if (span) {
+                    span.textContent = `Compartir (${data.count})`;
+                }
+                alert('✅ Publicación compartida correctamente');
+            })
+            .catch(err => console.error(err));
+        });
+    });
 
 });
 </script>

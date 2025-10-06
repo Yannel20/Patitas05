@@ -24,7 +24,7 @@
                     </button>
 
                     {{-- Botón mensaje --}}
-                    <a href="{{ route('chats.show', $user->id) }}" class="btn-mensaje">
+                    <a href="{{ route('chat', $user->id) }}" class="btn-mensaje">
                         Mensaje
                     </a>
                 </div>

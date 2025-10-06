@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>@yield('title', 'Mi App')</title>
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -85,7 +87,7 @@
             position: fixed;
             left: 220px;
             top: 10px;
-            background-color: #d5d4e0ff;
+            background-color: #d5d4e0ff;    
             color: black;
             width: 350px;
             max-height: 80vh;
@@ -110,7 +112,7 @@
         }
 
         #morePanel a:hover {
-            background-color: #9492aeff;
+            background-color: #9492aeff;   
             border-radius: 4px;
             padding-left: 5px;
         }
@@ -178,7 +180,7 @@
         }
 
         .sidebar-item button:hover {
-            background-color: #deb6d3ff;
+            background-color: #deb6d3ff; 
         }
 
         .sidebar-item button img {
