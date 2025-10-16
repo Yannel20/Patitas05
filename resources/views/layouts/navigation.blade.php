@@ -212,7 +212,7 @@
         <a href="{{ route('consultas.create') }}" class="{{ request()->routeIs('consultas.create') ? 'active' : '' }}">
             <img src="{{ asset('imagenes/lupa.png') }}" alt="Buscar"> Buscar
         </a>
-        <a href="{{ route('solicitudes.create') }}" class="{{ request()->routeIs('solicitudes.create') ? 'active' : '' }}">
+        <a href="{{ route('notificaciones.index') }}" class="{{ request()->routeIs('notificaciones.index') ? 'active' : '' }}">
             <img src="{{ asset('imagenes/notificaciones.png') }}" alt="Notificaciones"> Notificaciones
         </a>
         <a href="{{ route('mensajes.usuarios') }}" class="{{ request()->routeIs('mensajes.usuarios') ? 'active' : '' }}">

@@ -3,19 +3,20 @@
 namespace App\Livewire;
 
 use Livewire\Component;
-use App\Models\Message;
-use Illuminate\Support\Facades\Auth;
 use Livewire\WithFileUploads;
+use App\Models\Message;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 #[\Livewire\Attributes\Layout('layouts.navigation')]
 class Chat extends Component
 {
     use WithFileUploads;
 
-    public $chatMessages;    // Mensajes del chat
-    public $newMessage = ''; // Texto del mensaje
-    public $receiverId;      // Usuario receptor
-    public $file;            // Archivo a enviar
+    public $chatMessages;
+    public $newMessage = '';
+    public $receiverId;
+    public $file;
 
     public function mount($receiverId)
     {
@@ -23,7 +24,6 @@ class Chat extends Component
         $this->loadMessages();
     }
 
-    // Carga los últimos 50 mensajes entre los dos usuarios (más recientes primero)
     public function loadMessages()
     {
         $this->chatMessages = Message::with('user')
@@ -35,12 +35,11 @@ class Chat extends Component
                 $q->where('user_id', $this->receiverId)
                   ->where('receiver_id', Auth::id());
             })
-            ->latest()   // más nuevos primero
+            ->latest()
             ->take(50)
             ->get();
     }
 
-    // Enviar un mensaje
     public function sendMessage()
     {
         $this->validate([
@@ -51,7 +50,8 @@ class Chat extends Component
         $filePath = null;
 
         if ($this->file) {
-            $filePath = $this->file->store('chat_files', 'public');
+            // Guardar públicamente en Cellar
+            $filePath = $this->file->storePublicly('chat_files', 'ccs');
         }
 
         $message = Message::create([
@@ -61,23 +61,22 @@ class Chat extends Component
             'file_path' => $filePath,
         ]);
 
-        // Añadir al inicio del listado porque es el más nuevo
+        // Añadir al inicio del listado
         $this->chatMessages->prepend($message->load('user'));
 
+        // Limpiar inputs
         $this->newMessage = '';
         $this->file = null;
     }
 
-    // Eliminar un mensaje
     public function deleteMessage($id)
     {
         $message = Message::find($id);
 
         if ($message && $message->user_id === Auth::id()) {
-            if ($message->file_path && \Storage::disk('public')->exists($message->file_path)) {
-                \Storage::disk('public')->delete($message->file_path);
+            if ($message->file_path && \Storage::disk('ccs')->exists($message->file_path)) {
+                \Storage::disk('ccs')->delete($message->file_path);
             }
-
             $message->delete();
             $this->loadMessages();
         }

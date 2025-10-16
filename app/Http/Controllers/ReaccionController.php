@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Publicacion;
 use App\Models\Reaccion;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\NuevaActividadNotification;
 
 class ReaccionController extends Controller
 {
@@ -27,6 +28,17 @@ class ReaccionController extends Controller
                 'tipo' => 'love',
             ]);
             $liked = true;
+
+            // 🔔 Notificar al dueño de la publicación
+            if ($publicacion->user_id !== $user->id && $publicacion->user) {
+                $publicacion->user->notify(
+                    new NuevaActividadNotification(
+                        'like',
+                        ' le dio like a tu publicación.',
+                        $user
+                    )
+                );
+            }
         }
 
         // Contar todos los likes

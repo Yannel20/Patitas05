@@ -4,10 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Notifications\NuevaActividadNotification;
 
 class SeguirController extends Controller
 {
-        public function toggle(User $user)
+    public function toggle(User $user)
     {
         $authUser = auth()->user();
 
@@ -24,6 +25,15 @@ class SeguirController extends Controller
         } else {
             $authUser->siguiendo()->attach($user->id);
             $siguiendo = true;
+
+            // 🔔 Notificar al usuario seguido
+            $user->notify(
+                new NuevaActividadNotification(
+                    'seguir',
+                    ' comenzó a seguirte.',
+                    $authUser
+                )
+            );
         }
 
         return response()->json([
@@ -31,5 +41,4 @@ class SeguirController extends Controller
             'count' => $user->seguidores()->count(),
         ]);
     }
-
 }

@@ -85,14 +85,16 @@ body { background: #fafafa; font-family: 'Poppins', system-ui, -apple-system, 'S
             <div class="compartido">
                 <div><strong>{{ $publicacion->user->name }}</strong>: {{ $publicacion->descripcion }}</div>
                 @if($publicacion->media)
-                <img src="{{ asset('storage/' . $publicacion->media) }}" class="media">
+                <img src="{{ Storage::disk('ccs')->url($publicacion->media) }}">
+
                 @endif
             </div>
             @else
             {{-- Publicación normal --}}
             <div class="descripcion"><strong>{{ $publicacion->titulo }}</strong><br>{{ $publicacion->descripcion }}</div>
             @if($publicacion->media)
-                <img src="{{ asset('storage/' . $publicacion->media) }}" class="media">
+                <img src="{{ Storage::disk('ccs')->url($publicacion->media) }}">
+
             @endif
         @endif
 

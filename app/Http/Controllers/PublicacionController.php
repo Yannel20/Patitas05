@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Compartido;
 use App\Models\Reaccion;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\NuevaActividadNotification;
 
 class PublicacionController extends Controller
 {
@@ -51,11 +52,22 @@ class PublicacionController extends Controller
         $publicacion->user_id = Auth::id();
 
         if ($request->hasFile('media')) {
-            $mediaPath = $request->file('media')->store('publicaciones', 'public');
-            $publicacion->media = str_replace('public/', '', $mediaPath);
+            $publicacion->media = $request->file('media')->store('publicaciones', 'ccs');
         }
 
         $publicacion->save();
+
+        // 🔔 Notificar a todos los seguidores
+        $seguidores = auth()->user()->seguidores;
+        foreach ($seguidores as $seguidor) {
+            $seguidor->notify(
+                new NuevaActividadNotification(
+                    'publicacion',
+                    ' publicó una nueva publicación.',
+                    auth()->user()
+                )
+            );
+        }
 
         return redirect()->route('publicaciones.index')->with('success', '¡Publicación creada correctamente!');
     }
@@ -68,6 +80,17 @@ class PublicacionController extends Controller
         $publicacion->compartidos()->firstOrCreate([
             'user_id' => $user->id
         ]);
+
+        // 🔔 Notificar al dueño de la publicación
+        if ($publicacion->user_id !== $user->id && $publicacion->user) {
+            $publicacion->user->notify(
+                new NuevaActividadNotification(
+                    'compartido',
+                    ' compartió tu publicación.',
+                    $user
+                )
+            );
+        }
 
         if(request()->ajax()){
             return response()->json([
@@ -102,12 +125,47 @@ class PublicacionController extends Controller
                 'tipo' => 'love'
             ]);
             $liked = true;
+
+            // 🔔 Notificar al dueño
+            if ($publicacion->user_id !== $user->id && $publicacion->user) {
+                $publicacion->user->notify(
+                    new NuevaActividadNotification(
+                        'like',
+                        ' le dio like a tu publicación.',
+                        $user
+                    )
+                );
+            }
         }
 
         return response()->json([
             'liked' => $liked,
             'count' => $publicacion->reacciones()->where('tipo', 'love')->count()
         ]);
+    }
+
+    // Comentar
+    public function comentar(Request $request, Publicacion $publicacion)
+    {
+        $request->validate(['contenido' => 'required|string|max:500']);
+
+        $comentario = $publicacion->comentarios()->create([
+            'user_id' => auth()->id(),
+            'contenido' => $request->contenido
+        ]);
+
+        // 🔔 Notificar al dueño de la publicación
+        if ($publicacion->user_id !== auth()->id() && $publicacion->user) {
+            $publicacion->user->notify(
+                new NuevaActividadNotification(
+                    'comentario',
+                    ' comentó: "' . $request->contenido . '"',
+                    auth()->user()
+                )
+            );
+        }
+
+        return back();
     }
 
     // Evitar acceso a show individual
@@ -152,7 +210,6 @@ class PublicacionController extends Controller
     // Perfil de usuario
     public function perfil(User $user)
     {
-        // Publicaciones propias
         $publicacionesPropias = Publicacion::with([
             'user',
             'comentarios.user',
@@ -160,7 +217,6 @@ class PublicacionController extends Controller
             'compartidos.user'
         ])->where('user_id', $user->id);
 
-        // Publicaciones compartidas
         $publicacionesCompartidas = Publicacion::with([
             'user',
             'comentarios.user',
@@ -173,7 +229,6 @@ class PublicacionController extends Controller
               return $pub;
           });
 
-        // Combinar ambas colecciones
         $publicaciones = $publicacionesPropias->get()->merge($publicacionesCompartidas)
                                 ->sortByDesc(fn($p) => $p->created_at);
 

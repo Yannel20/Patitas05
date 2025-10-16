@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CampanaEsterilizacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\NuevaActividadNotification;
 
 class CampanaEsterilizacionController extends Controller
 {
@@ -18,8 +19,8 @@ class CampanaEsterilizacionController extends Controller
     // Mostrar formulario de creación
     public function create()
     {
-         $campana = null;
-         return view('campanas.create', compact('campana'));
+        $campana = null;
+        return view('campanas.create', compact('campana'));
     }
 
     // Guardar nueva campaña
@@ -32,13 +33,25 @@ class CampanaEsterilizacionController extends Controller
             'criterios'    => 'nullable|string',
         ]);
 
-        CampanaEsterilizacion::create([
+        $campana = CampanaEsterilizacion::create([
             'user_id'      => Auth::id(),
             'fecha_inicio' => $request->fecha_inicio,
             'fecha_fin'    => $request->fecha_fin,
             'descripcion'  => $request->descripcion,
             'criterios'    => $request->criterios,
         ]);
+
+        // 🔔 Notificar a todos los seguidores del usuario que creó la campaña
+        $seguidores = Auth::user()->seguidores; // asegúrate de tener la relación 'seguidores'
+        foreach ($seguidores as $seguidor) {
+            $seguidor->notify(
+                new NuevaActividadNotification(
+                    'campana',
+                    Auth::user()->name.' publicó una campaña de esterilización.',
+                    Auth::user()
+                )
+            );
+        }
 
         return redirect()->route('campanas.index')->with('success', 'Campaña creada correctamente.');
     }
@@ -88,7 +101,7 @@ class CampanaEsterilizacionController extends Controller
         return view('campanas.publicacion', compact('campanas'));
     }
 
-    // Mostrar detalles de una campaña (opcional)
+    // Mostrar detalles de una campaña
     public function show($id)
     {
         $campana = CampanaEsterilizacion::with('solicitudes')->findOrFail($id);

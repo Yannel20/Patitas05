@@ -62,8 +62,8 @@ class MascotaController extends Controller
             'ID_dueno'  => 'nullable|exists:duenos,ID_dueno',
             'nombre_m'  => 'required|string|max:255',
             'especie'   => 'required|string|max:50',
-            'raza'      => 'required|string|max:50',
-            'sexo'      => 'required|string|max:10',
+            'raza'      => 'nullable|string|max:50',
+            'sexo'      => 'required|string|max:1',
             'edad'      => 'required|integer|min:0',
         ]);
 

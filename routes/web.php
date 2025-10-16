@@ -14,10 +14,11 @@ use App\Http\Controllers\HistorialMedicoController;
 use App\Http\Controllers\CampanaEsterilizacionController;
 use App\Http\Controllers\SolicitudCEController;
 use App\Http\Controllers\BusquedaController;
-use App\Http\Controllers\NotificacionController;
+use App\Http\Controllers\NotificacionesController;
 use App\Http\Controllers\SeguirController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\MensajesController;
+use App\Notifications\NuevaActividadNotification;
 use App\Livewire\Chat;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
@@ -55,7 +56,6 @@ Route::middleware('auth')->group(function () {
     // AJAX: seguir usuario
     Route::post('/usuarios/{user}/seguir', [SeguirController::class, 'toggle'])->name('usuarios.seguir')->middleware('auth');
 
-
     // Ver todos los comentarios de una publicación
     Route::get('/publicaciones/{publicacion}/comentarios-todos', function(App\Models\Publicacion $publicacion) {
         $comentarios = $publicacion->comentarios()->with('user')->latest()->get();
@@ -83,8 +83,6 @@ Route::middleware('auth')->group(function () {
     Route::resource('solicitudes', SolicitudCEController::class);
 
     // Notificaciones
-    Route::get('/notificaciones', [NotificacionController::class, 'index'])->name('notificaciones.index');
-    Route::get('/notificaciones/leer/{id}', [NotificacionController::class, 'leer'])->name('notificaciones.leer');
 
 });
 
@@ -104,6 +102,13 @@ Route::get('/mensajes', [MensajesController::class, 'index'])
 
 // Chat con usuario específico usando Livewire
 Route::get('/chat/{receiverId}', Chat::class)->middleware('auth')->name('chat');
+
+Route::middleware('auth')->group(function() {
+    Route::get('/notificaciones', [NotificacionesController::class, 'index'])->name('notificaciones.index');
+    Route::post('/notificaciones/{id}/leer', [NotificacionesController::class, 'marcarComoLeida'])->name('notificaciones.leer');
+    Route::post('/notificaciones/leer-todas', [NotificacionesController::class, 'marcarTodasComoLeidas'])->name('notificaciones.leer.todas');
+});
+
 
 // Requerido por Laravel auth
 require __DIR__.'/auth.php';
