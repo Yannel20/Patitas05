@@ -218,7 +218,7 @@
         <a href="{{ route('mensajes.usuarios') }}" class="{{ request()->routeIs('mensajes.usuarios') ? 'active' : '' }}">
             <img src="{{ asset('imagenes/comentario.png') }}" alt="Mensajes"> Mensajes
         </a>
-        <a href="{{ route('campanas.publicacion') }}" class="{{ request()->routeIs('campanas.publicacion') ? 'active' : '' }}">
+        <a href="{{ route('explorar') }}" class="{{ request()->routeIs('explorar') ? 'active' : '' }}">
             <img src="{{ asset('imagenes/mundial.png') }}" alt="Explorar"> Explorar
         </a>
 
@@ -313,6 +313,8 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

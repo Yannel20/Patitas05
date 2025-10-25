@@ -18,5 +18,10 @@ class Message extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function getFileUrlAttribute()
+    {
+        return $this->file_path ? Storage::disk('ccs')->url($this->file_path) : null;
+    }
+
      
 }

@@ -1,77 +1,81 @@
-<section>
-    <header>
-        <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Información del Perfil') }}
-        </h2>
+<div class="container py-5">
+    <div class="card shadow-lg border-0 mx-auto" style="max-width: 600px; border-radius: 15px;">
+        <div class="card-body">
+             <h2 class="text-center fw-bold mb-3" style="color:#212529">Información del perfil</h2>
 
-        <p class="mt-1 text-sm text-gray-600">
-            {{ __('Actualiza la información de tu perfil y tu dirección de correo electrónico.') }}
-        </p>
-    </header>
+            <p class="text-center text-muted mb-4">
+                Actualiza tu información personal y dirección de correo.
+            </p>
 
-    <form id="send-verification" method="post" action="{{ route('verification.send') }}">
-        @csrf
-    </form>
+            <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
+                @csrf
+                @method('patch')
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
-        @csrf
-        @method('patch')
+                {{-- Imagen de perfil --}}
+                <div class="text-center mb-4">
+                    @if ($user->photo)
+                        <img src="{{ $user->photo }}" 
+                            class="rounded-circle shadow mb-3" 
+                            width="120" height="120" 
+                            alt="Foto de perfil">
+                    @else
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=cd4daa&color=fff"
+                            class="rounded-circle shadow mb-3" 
+                            width="120" height="120" 
+                            alt="Avatar">
+                    @endif
 
-        <!-- Nombre -->
-        <div>
-            <x-input-label for="name" :value="'Nombre'" />
-            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
-            <x-input-error class="mt-2" :messages="$errors->get('name')" />
-        </div>
 
-        <!-- Correo Electrónico -->
-        <div>
-            <x-input-label for="email" :value="'Correo Electrónico'" />
-            <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
-            <x-input-error class="mt-2" :messages="$errors->get('email')" />
+                    <div class="mb-3">
+                        <label for="photo" class="form-label fw-semibold">Foto de Perfil</label>
+                        <input class="form-control" type="file" id="photo" name="photo" accept="image/*">
+                        @error('photo') 
+                            <div class="text-danger small">{{ $message }}</div> 
+                        @enderror
+                    </div>
+                </div>
 
-            @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
-                <div>
-                    <p class="text-sm mt-2 text-gray-800">
-                        {{ __('Tu dirección de correo no está verificada.') }}
-                        <button form="send-verification" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            {{ __('Haz clic aquí para reenviar el correo de verificación.') }}
-                        </button>
-                    </p>
+                {{-- Nombre --}}
+                <div class="mb-3">
+                    <label for="name" class="form-label fw-semibold">Nombre</label>
+                    <input type="text" id="name" name="name" 
+                           class="form-control" 
+                           value="{{ old('name', $user->name) }}" required>
+                    @error('name') 
+                        <div class="text-danger small">{{ $message }}</div> 
+                    @enderror
+                </div>
 
-                    @if (session('status') === 'verification-link-sent')
-                        <p class="mt-2 font-medium text-sm text-green-600">
-                            {{ __('Se ha enviado un nuevo enlace de verificación a tu correo electrónico.') }}
-                        </p>
+                {{-- Correo --}}
+                <div class="mb-3">
+                    <label for="email" class="form-label fw-semibold">Correo Electrónico</label>
+                    <input type="email" id="email" name="email" 
+                           class="form-control" 
+                           value="{{ old('email', $user->email) }}" required>
+                    @error('email') 
+                        <div class="text-danger small">{{ $message }}</div> 
+                    @enderror
+                </div>
+
+                {{-- Tipo de usuario --}}
+                <div class="mb-3">
+                    <label for="tipo_usuario" class="form-label fw-semibold">Tipo de Usuario</label>
+                    <input type="text" id="tipo_usuario" name="tipo_usuario" 
+                           class="form-control bg-light" 
+                           value="{{ $user->tipo_usuario }}" readonly>
+                </div>
+
+                {{-- Botón --}}
+                <div class="text-center mt-4">
+                    <button class="btn btn-lg text-white px-5 fw-semibold" style="background-color:#cd4daa;">
+                        Guardar Cambios
+                    </button>
+
+                    @if (session('status') === 'profile-updated')
+                        <p class="text-success mt-3 fw-semibold">Guardado correctamente.</p>
                     @endif
                 </div>
-            @endif
+            </form>
         </div>
-
-        <!-- Tipo de Usuario -->
-        <div>
-            <x-input-label for="tipo_usuario" :value="'Tipo de Usuario'" />
-            <select id="tipo_usuario" name="tipo_usuario" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                <option value="normal" {{ old('tipo_usuario', $user->tipo_usuario) === 'normal' ? 'selected' : '' }}>Usuario Normal</option>
-                <option value="veterinaria" {{ old('tipo_usuario', $user->tipo_usuario) === 'veterinaria' ? 'selected' : '' }}>Veterinaria</option>
-                <option value="refugio" {{ old('tipo_usuario', $user->tipo_usuario) === 'refugio' ? 'selected' : '' }}>Refugio</option>
-            </select>
-            <x-input-error class="mt-2" :messages="$errors->get('tipo_usuario')" />
-        </div>
-
-        <!-- Botón Guardar -->
-        <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Guardar') }}</x-primary-button>
-
-            @if (session('status') === 'profile-updated')
-                <p
-                    x-data="{ show: true }"
-                    x-show="show"
-                    x-transition
-                    x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600"
-                >{{ __('Guardado.') }}</p>
-            @endif
-        </div>
-    </form>
-</section>
+    </div>
+</div>

@@ -10,13 +10,11 @@
         
         @foreach($chatMessages as $message)
             <div style="margin-bottom:14px; display:flex; flex-direction:column; {{ $message->user_id === auth()->id() ? 'align-items:flex-end;' : 'align-items:flex-start;' }}">
-                
-                <!-- Nombre del usuario -->
+
                 <div style="font-size:0.8rem; font-weight:bold; margin-bottom:4px; color:#000;">
                     {{ $message->user->name }}
                 </div>
 
-                <!-- Burbuja del mensaje -->
                 <div style="
                     max-width:70%; 
                     padding:8px 12px;    
@@ -28,12 +26,10 @@
                         : 'background:#dddcedff; color:black; border-bottom-left-radius:4px;' }} "
                     class="message-bubble">
 
-                    <!-- Texto del mensaje -->
                     @if($message->body)
                         <span>{{ $message->body }}</span>
                     @endif
 
-                    <!-- Archivo adjunto -->
                     @if($message->file_path)
                         @php $ext = strtolower(pathinfo($message->file_path, PATHINFO_EXTENSION)); @endphp
                         <div style="margin-top:6px;">
@@ -49,7 +45,6 @@
                         </div>
                     @endif
 
-                    <!-- Botón eliminar SOLO si es mío -->
                     @if($message->user_id === auth()->id())
                         <button onclick="if(confirm('¿Seguro que quieres eliminar este mensaje?')) { @this.deleteMessage({{ $message->id }}) }"
                                 class="delete-btn">
@@ -58,7 +53,6 @@
                     @endif
                 </div>
 
-                <!-- Fecha del mensaje -->
                 <div style="font-size:0.75rem; color:#555; margin-top:2px;">
                     {{ $message->created_at->format('d/m/Y H:i') }}
                 </div>
@@ -66,12 +60,11 @@
         @endforeach
     </div>
 
-    <!-- Formulario para enviar mensaje -->
+    <!-- Formulario -->
     <form wire:submit.prevent="sendMessage" style="display:flex; gap:5px; align-items:center;">
         <input type="text" wire:model="newMessage" placeholder="Escribe tu mensaje..." 
                style="flex:1; padding:8px; border-radius:4px; border:1px solid #bbb8dbff;">
 
-        <!-- Botón "+" para adjuntar archivo -->
         <label style="cursor:pointer; background:#e7bce0ff; padding:8px 12px; border-radius:50%; font-size:18px;">
             +
             <input type="file" wire:model="file" style="display:none;">
@@ -85,12 +78,8 @@
     @error('newMessage') <span style="color:red;">{{ $message }}</span> @enderror
     @error('file') <span style="color:red;">{{ $message }}</span> @enderror
 
-    <!-- Estilos para hover en botón eliminar -->
     <style>
-        .message-bubble {
-            position: relative;
-        }
-
+        .message-bubble { position: relative; }
         .delete-btn {
             display: none;
             position: absolute;
@@ -104,20 +93,27 @@
             transition: opacity 0.2s ease-in-out;
             opacity: 0;
         }
-
         .message-bubble:hover .delete-btn {
             display: block;
             opacity: 1;
         }
     </style>
 
-    <!-- Script para mantener el scroll arriba -->
     <script>
         document.addEventListener('livewire:load', function () {
             const messagesContainer = document.getElementById('messagesContainer');
             function scrollToTop() { messagesContainer.scrollTop = 0; }
             scrollToTop();
-            Livewire.hook('message.processed', (message, component) => { scrollToTop(); });
+            Livewire.hook('message.processed', () => { scrollToTop(); });
+
+            const userId = @json(auth()->id());
+            const receiverId = @json($receiverId);
+            const channelId = [userId, receiverId].sort().join('.');
+
+            window.Echo.private(`chat.${channelId}`)
+                .listen('.message.sent', (event) => {
+                    Livewire.emit('incomingMessage', event);
+                });
         });
     </script>
 </div>

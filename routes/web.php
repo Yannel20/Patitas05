@@ -109,6 +109,10 @@ Route::middleware('auth')->group(function() {
     Route::post('/notificaciones/leer-todas', [NotificacionesController::class, 'marcarTodasComoLeidas'])->name('notificaciones.leer.todas');
 });
 
+Route::get('/explorar', function () {
+    return view('explorar');
+})->name('explorar');
+
 
 // Requerido por Laravel auth
 require __DIR__.'/auth.php';

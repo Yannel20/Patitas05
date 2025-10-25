@@ -1,7 +1,6 @@
 import Echo from 'laravel-echo';
 
-import Pusher from 'pusher-js';
-window.Pusher = Pusher;
+// Reverb no necesita Pusher aquí, así que no lo importamos ni lo asignamos.
 
 window.Echo = new Echo({
     broadcaster: 'reverb',

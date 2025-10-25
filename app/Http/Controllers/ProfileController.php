@@ -7,12 +7,13 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
     /**
-     * Display the user's profile form.
+     * Mostrar el formulario del perfil del usuario.
      */
     public function edit(Request $request): View
     {
@@ -22,23 +23,49 @@ class ProfileController extends Controller
     }
 
     /**
-     * Update the user's profile information.
+     * Actualizar la información del perfil del usuario.
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        // Validar la imagen antes de subirla
+        $request->validate([
+            'photo' => ['nullable', 'image', 'max:2048'],
+        ]);
+
+        // 📸 Si hay una nueva foto
+        if ($request->hasFile('photo')) {
+            // Eliminar la anterior si existe (solo si era una ruta, no URL completa)
+            if ($user->photo && str_contains($user->photo, 'profile-photos/')) {
+                // Eliminamos del bucket CCS
+                Storage::disk('ccs')->delete($user->photo);
+            }
+
+            // Guardamos la nueva en la carpeta "profile-photos"
+            $path = $request->file('photo')->store('profile-photos', 'ccs');
+
+            // La hacemos pública (por si el bucket es privado)
+            Storage::disk('ccs')->setVisibility($path, 'public');
+
+            // Obtenemos la URL pública
+            $user->photo = Storage::disk('ccs')->url($path);
         }
 
-        $request->user()->save();
+        // Actualizamos nombre, email, etc.
+        $user->fill($request->validated());
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
     /**
-     * Delete the user's account.
+     * Eliminar la cuenta del usuario.
      */
     public function destroy(Request $request): RedirectResponse
     {
@@ -49,6 +76,11 @@ class ProfileController extends Controller
         $user = $request->user();
 
         Auth::logout();
+
+        // Opcional: borrar foto de S3 si existe
+        if ($user->photo && str_contains($user->photo, 'profile-photos/')) {
+            Storage::disk('ccs')->delete($user->photo);
+        }
 
         $user->delete();
 

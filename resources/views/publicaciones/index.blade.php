@@ -14,7 +14,6 @@ body { background: #fafafa; font-family: 'Poppins', system-ui, -apple-system, 'S
 .avatar { width:42px; height:42px; border-radius:50%; object-fit:cover; } 
 .username { font-weight:600; color: #710f54ff; } 
 .timestamp { color:#8e8e8e; font-size:13px; } 
-.media { width:100%; max-height:540px; object-fit:cover; display:block; background:#000; margin-top:6px; } 
 .card-body { padding:12px 14px; } 
 .actions { display:flex; align-items:center; gap:12px; margin-bottom:8px; } 
 .btn-love, .btn-share, .btn-seguir { background:none; border:none; cursor:pointer; font-size:14px; display:inline-flex; align-items:center; gap:6px; padding:4px 6px; } 
@@ -37,7 +36,19 @@ body { background: #fafafa; font-family: 'Poppins', system-ui, -apple-system, 'S
 .menu-options button { display:block; width:100%; padding:8px 12px; border:none; background:none; cursor:pointer; text-align:left; } 
 .menu-options button:hover { background:#f4cfd9; }  
 .compartido { border:1px solid #e0afbfff; padding:8px; background:#f9f9f9; margin-top:6px; border-radius:8px; }
+.media {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 400px;
+    object-fit: contain;
+    object-position: center;
+    border-radius: 10px;
+    background-color: #000;
+}
+
 </style>
+
 
 <div class="container-feed">
   @foreach($publicaciones as $publicacion)
@@ -45,7 +56,7 @@ body { background: #fafafa; font-family: 'Poppins', system-ui, -apple-system, 'S
       <div class="card-header">
         <div style="display:flex;align-items:center;gap:12px">
           <a href="{{ route('perfil.show', $publicacion->user->id) }}">
-              <img src="{{ $publicacion->user->profile_photo_url ?? 'https://ui-avatars.com/api/?name=' . urlencode($publicacion->user->name) }}" alt="avatar" class="avatar">
+              <img src="{{ $publicacion->user->photo ?? 'https://ui-avatars.com/api/?name=' . urlencode($publicacion->user->name) }}" alt="avatar" class="avatar">
           </a>
           <div>
             <a href="{{ route('perfil.show', $publicacion->user->id) }}" class="username">
@@ -85,7 +96,8 @@ body { background: #fafafa; font-family: 'Poppins', system-ui, -apple-system, 'S
             <div class="compartido">
                 <div><strong>{{ $publicacion->user->name }}</strong>: {{ $publicacion->descripcion }}</div>
                 @if($publicacion->media)
-                <img src="{{ Storage::disk('ccs')->url($publicacion->media) }}">
+                <img src="{{ Storage::disk('ccs')->url($publicacion->media) }}" class="media" alt="imagen de la publicación">
+
 
                 @endif
             </div>
@@ -93,7 +105,8 @@ body { background: #fafafa; font-family: 'Poppins', system-ui, -apple-system, 'S
             {{-- Publicación normal --}}
             <div class="descripcion"><strong>{{ $publicacion->titulo }}</strong><br>{{ $publicacion->descripcion }}</div>
             @if($publicacion->media)
-                <img src="{{ Storage::disk('ccs')->url($publicacion->media) }}">
+                <img src="{{ Storage::disk('ccs')->url($publicacion->media) }}" class="media" alt="imagen de la publicación">
+
 
             @endif
         @endif
