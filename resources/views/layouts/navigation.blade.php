@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>@yield('title', 'Mi App')</title>
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
     <style>
         body {
             display: flex;
             height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
+            overflow-x: hidden;
         }
 
         /* Sidebar */
@@ -28,17 +31,15 @@
             z-index: 1000;
             border-left: 2px solid #cd4daaff;
             border-right: 15px solid #cd4daaff;
+            transition: transform 0.3s ease;
         }
 
-        /* Encabezado Patitas */
         .sidebar-header {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background-color: transparent;
             padding: 10px;
-            margin: 0px;
             font-style: italic;
             font-family: 'Georgia', serif;
             font-weight: bold;
@@ -75,19 +76,12 @@
             border-radius: 6px;
         }
 
-        /* Activo */
-        
-
-        /* Sidebar items */
-        .sidebar-item {
-            position: relative;
-        }
-
+        /* Panel “Más” */
         #morePanel {
             position: fixed;
             left: 220px;
             top: 10px;
-            background-color: #d5d4e0ff;    
+            background-color: #d5d4e0ff;
             color: black;
             width: 350px;
             max-height: 80vh;
@@ -98,12 +92,6 @@
             z-index: 2000;
         }
 
-        #morePanel h6 {
-            color: #0f0f0fff;
-            margin-top: 10px;
-            margin-bottom: 5px;
-        }
-
         #morePanel a {
             color: black;
             text-decoration: none;
@@ -112,18 +100,21 @@
         }
 
         #morePanel a:hover {
-            background-color: #9492aeff;   
+            background-color: #9492aeff;
             border-radius: 4px;
             padding-left: 5px;
         }
 
+        /* Contenido principal */
         .content {
             flex: 1;
             padding: 20px;
             margin-left: 220px;
             overflow-y: auto;
+            transition: margin-left 0.3s ease;
         }
 
+        /* Menú de usuario */
         .user-menu button {
             background-color: transparent;
             color: black;
@@ -180,7 +171,7 @@
         }
 
         .sidebar-item button:hover {
-            background-color: #deb6d3ff; 
+            background-color: #deb6d3ff;
         }
 
         .sidebar-item button img {
@@ -188,55 +179,111 @@
             height: 22px;
             margin-right: 8px;
         }
+
+        /* --- RESPONSIVE --- */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 10px;
+            left: 15px;
+            z-index: 1100;
+            background-color: #cd4daaff;
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            border-radius: 6px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+                background-color: #fff;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            #morePanel {
+                position: absolute;
+                left: 10px;
+                top: 100%;
+                width: 90%;
+                border: 1px solid #ccc;
+            }
+
+            .sidebar-header .titulo-patitas {
+                font-size: 28px;
+            }
+
+            .sidebar a {
+                font-size: 0.95rem;
+                padding: 8px 15px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .user-menu {
+                top: 5px;
+                right: 5px;
+            }
+
+            .user-menu button {
+                font-size: 0.9rem;
+                padding: 6px 10px;
+            }
+
+            .sidebar-header img.logo-huella {
+                width: 40px;
+                height: 35px;
+            }
+        }
     </style>
-     @livewireStyles
+    @livewireStyles
 </head>
 <body>
 
+    <!-- Botón hamburguesa -->
+    <button class="menu-toggle" id="menuToggle">☰</button>
+
     <!-- Sidebar -->
     <div class="sidebar">
-        <!-- Encabezado -->
         <div class="sidebar-header">
             <div class="titulo-patitas">Patitas</div>
-            <div class="underline"></div> 
             <img src="{{ asset('imagenes/corazon.png') }}" alt="Huella" class="logo-huella">
         </div>
 
-        <!-- Menú principal con íconos -->
-        <a href="{{ route('publicaciones.index') }}" class="{{ request()->routeIs('publicaciones.index') ? 'active' : '' }}">
-            <img src="{{ asset('imagenes/home.png') }}" alt="Home"> Home
-        </a>
-        <a href="{{ route('publicaciones.create') }}" class="{{ request()->routeIs('publicaciones.create') ? 'active' : '' }}">
-            <img src="{{ asset('imagenes/crear.png') }}" alt="Crear"> Crear
-        </a>
-        <a href="{{ route('consultas.create') }}" class="{{ request()->routeIs('consultas.create') ? 'active' : '' }}">
-            <img src="{{ asset('imagenes/lupa.png') }}" alt="Buscar"> Buscar
-        </a>
-        <a href="{{ route('notificaciones.index') }}" class="{{ request()->routeIs('notificaciones.index') ? 'active' : '' }}">
-            <img src="{{ asset('imagenes/notificaciones.png') }}" alt="Notificaciones"> Notificaciones
-        </a>
-        <a href="{{ route('mensajes.usuarios') }}" class="{{ request()->routeIs('mensajes.usuarios') ? 'active' : '' }}">
-            <img src="{{ asset('imagenes/comentario.png') }}" alt="Mensajes"> Mensajes
-        </a>
-        <a href="{{ route('explorar') }}" class="{{ request()->routeIs('explorar') ? 'active' : '' }}">
-            <img src="{{ asset('imagenes/mundial.png') }}" alt="Explorar"> Explorar
-        </a>
+        <a href="{{ route('publicaciones.index') }}"><img src="{{ asset('imagenes/home.png') }}"> Home</a>
+        <a href="{{ route('publicaciones.create') }}"><img src="{{ asset('imagenes/crear.png') }}"> Crear</a>
+        <a href="{{ route('buscar') }}"><img src="{{ asset('imagenes/lupa.png') }}"> Buscar</a>
+        <a href="{{ route('notificaciones.index') }}"><img src="{{ asset('imagenes/notificaciones.png') }}"> Notificaciones</a>
+        <a href="{{ route('mensajes.usuarios') }}"><img src="{{ asset('imagenes/comentario.png') }}"> Mensajes</a>
+        <a href="{{ route('explorar') }}"><img src="{{ asset('imagenes/mundial.png') }}"> Explorar</a>
 
         @auth
             @if (Auth::user()->tipo_usuario === 'refugio')
-                <a href="{{ route('publicaciones.index') }}" class="{{ request()->routeIs('publicaciones.index') ? 'active' : '' }}">
-                    <img src="{{ asset('icons/dog.png') }}" alt="Adopción"> Publicar mascota en adopción
+                <a href="{{ route('publicaciones.index') }}">
+                    <img src="{{ asset('icons/dog.png') }}"> Publicar mascota en adopción
                 </a>
             @endif
         @endauth
 
         @auth
             @if (Auth::user()->tipo_usuario === 'veterinaria')
-                <!-- Botón Más -->
                 <div class="sidebar-item">
-                    <button id="moreBtn">
-                        <img src="{{ asset('imagenes/mas.png') }}" alt="Más"> Más
-                    </button>
+                    <button id="moreBtn"><img src="{{ asset('imagenes/mas.png') }}"> Más</button>
 
                     <div id="morePanel">
                         <h6>Expedientes</h6>
@@ -246,42 +293,35 @@
                         <a href="{{ route('historial.index') }}">📖 Historial Médico</a>
                         <a href="{{ route('vacunaciones.index') }}">💉 Vacunaciones</a>
                         <a href="{{ route('tratamientos.index') }}">💊 Tratamientos</a>
-                        <a href="{{ route('tratamientos.index') }}">⬇️ Descargar Reporte</a>
-                        <a href="{{ route('tratamientos.index') }}">📧 Enviar Reporte</a>
 
                         <hr style="border-color: #495057;">
-
-                        <h6>Campañas de Esterilización</h6>
+                        <h6>Campañas</h6>
                         <a href="{{ route('campanas.create') }}">📝 Publicar Campaña</a>
-                        <a href="{{ route('solicitudes.index') }}">📨 Recibir solicitudes </a>
+                        <a href="{{ route('solicitudes.index') }}">📨 Solicitudes</a>
                         <a href="{{ route('campanas.index') }}">📊 Control Campañas</a>
                     </div>
                 </div>
             @endif
         @endauth
 
-        <a href="{{ route('profile.edit') }}" class="{{ request()->routeIs('profile.edit') ? 'active' : '' }}">
-            <img src="{{ asset('imagenes/usuario.png') }}" alt="Perfil"> Perfil
-        </a>
+        <a href="{{ route('profile.edit') }}"><img src="{{ asset('imagenes/usuario.png') }}"> Perfil</a>
 
-        <!-- Cierre de sesión -->
+        <!-- Logout -->
         <form method="POST" action="{{ route('logout') }}" style="margin-top: 20px; padding: 0 20px;">
             @csrf
-            <button type="submit" style="background: none; border: none; color: black; text-align: left; padding: 10px 0; width: 100%; display: flex; align-items: center;">
-                <img src="{{ asset('imagenes/cerrar.png') }}" alt="Salir" style="width:22px; height:22px; margin-right:10px;">
-                Cerrar sesión
+            <button type="submit" style="background:none; border:none; color:black; text-align:left; padding:10px 0; width:100%; display:flex; align-items:center;">
+                <img src="{{ asset('imagenes/cerrar.png') }}" style="width:22px; height:22px; margin-right:10px;"> Cerrar sesión
             </button>
         </form>
     </div>
 
-    <!-- Menú de usuario arriba a la derecha -->
+    <!-- Menú de usuario -->
     @auth
     <div class="user-menu" style="position: absolute; top: 10px; right: 10px; z-index: 9999;">
         <div style="position: relative;">
             <button id="dropdownToggle" onclick="toggleDropdown()">
                 {{ Auth::user()->name }}
             </button>
-
             <div id="dropdown">
                 <a href="{{ route('profile.edit') }}">Actualizar Perfil</a>
                 <form method="POST" action="{{ route('logout') }}" style="margin:0;">
@@ -293,16 +333,7 @@
     </div>
     @endauth
 
-    <!-- Header -->
-    @isset($header)
-    <header class="bg-white shadow">
-        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            {{ $header }}
-        </div>
-    </header>
-    @endisset
-
-    <!-- Contenido principal -->
+    <!-- Contenido -->
     <div class="content">
         @hasSection('content')
             @yield('content')
@@ -313,15 +344,14 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-
 
     <script>
+        // Sidebar - Botón Más
         document.addEventListener('DOMContentLoaded', function() {
             const moreBtn = document.getElementById('moreBtn');
             const morePanel = document.getElementById('morePanel');
 
-            if(moreBtn){
+            if (moreBtn) {
                 moreBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
                     morePanel.style.display = morePanel.style.display === 'none' ? 'block' : 'none';
@@ -341,14 +371,31 @@
             dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
         }
 
-        document.addEventListener('click', function (e) {
+        document.addEventListener('click', function(e) {
             const dropdown = document.getElementById('dropdown');
             const toggle = document.getElementById('dropdownToggle');
             if (dropdown && toggle && !toggle.contains(e.target) && !dropdown.contains(e.target)) {
                 dropdown.style.display = 'none';
             }
         });
+
+        // Menú responsive
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.querySelector('.sidebar');
+
+        if (menuToggle && sidebar) {
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        }
     </script>
-@livewireScripts
+
+    @livewireScripts
 </body>
 </html>

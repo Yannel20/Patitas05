@@ -88,7 +88,7 @@ Route::middleware('auth')->group(function () {
 
 // Adopción de mascotas
 Route::get('/adopta/crear', [MascotaAdopcionController::class, 'create'])->name('mascotaAdopcion.create');
-Route::post('/adopta/guardar', [MascotaAdopcionController::class, 'store'])->name('mascotas.store');
+Route::post('/adopta/guardar', [MascotaAdopcionController::class, 'store'])->name('mascotaAdopcion.store');
 Route::get('/adopta', [MascotaAdopcionController::class, 'index'])->name('adopta.index');
 
 // Búsqueda
@@ -113,6 +113,9 @@ Route::get('/explorar', function () {
     return view('explorar');
 })->name('explorar');
 
-
+Route::get('/buscar', [BusquedaController::class, 'index'])->name('buscar');
+Route::post('/buscar/guardar', [BusquedaController::class, 'guardar'])->name('buscar.guardar');
+Route::get('/busquedas/guardadas', [BusquedaController::class, 'misBusquedas'])->name('busqueda.guardadas');
+Route::delete('/busquedas/{id}', [BusquedaController::class, 'eliminar'])->name('busqueda.eliminar');
 // Requerido por Laravel auth
 require __DIR__.'/auth.php';
