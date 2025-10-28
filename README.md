@@ -50,7 +50,7 @@ Vite manifest not found at: ...\public\build/manifest.json
 Explicación:
 Laravel usa Vite para compilar los archivos frontend (JS/CSS). Este error aparece cuando no se ha generado el build de Vite.
 Solución:
-1.	Instala las dependencias de Node:
+1.	Instala las dependencias de Node:}
 npm install
 2.	Genera el build:
 npm run build
@@ -64,3 +64,14 @@ VITE_DEV_SERVER=true
 •	Revisa los logs de Laravel si sigue fallando:
 storage/logs/laravel.log
 •	Haz composer install y npm install al descargar un proyecto Laravel.
+•	Para que el proyecto funcione con los datos en tiempo real, debes crear el archivo .env en la raíz del proyecto y añadir la siguiente configuración de conexión:
+
+DB_CONNECTION=mysql
+DB_HOST=b60pyfgptnwp2r2n1q8k-mysql.services.clever-cloud.com
+DB_PORT=3306
+DB_DATABASE=b60pyfgptnwp2r2n1q8k
+DB_USERNAME=u9ac9ulxaf0wjnkm
+DB_PASSWORD=0bof7wwSeLhaIclX03K1
+#DB_URL=mysql://u9ac9ulxaf0wjnkm:0bof7wwSeLhaIclX03K1@b60pyfgptnwp2r2n1q8k-mysql.services.clever-cloud.com:3306/b60pyfgptnwp2r2n1q8k
+   
+
