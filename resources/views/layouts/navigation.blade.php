@@ -271,6 +271,8 @@
         <a href="{{ route('notificaciones.index') }}"><img src="{{ asset('imagenes/notificaciones.png') }}"> Notificaciones</a>
         <a href="{{ route('mensajes.usuarios') }}"><img src="{{ asset('imagenes/comentario.png') }}"> Mensajes</a>
         <a href="{{ route('explorar') }}"><img src="{{ asset('imagenes/mundial.png') }}"> Explorar</a>
+        <a href="{{ route('guias.rapidas') }}"><img src="{{ asset('imagenes/mundial.png') }}"> Ayudas</a>
+
 
         @auth
             @if (Auth::user()->tipo_usuario === 'refugio')

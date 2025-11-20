@@ -24,9 +24,11 @@ use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 
-// Redirigir raíz a login
 Route::get('/', function () {
-    return redirect()->route('login');
+    if (auth()->check()) {
+        return redirect()->route('publicaciones.index');
+    }
+    return view('auth.login');
 });
 
 // Rutas protegidas por auth
@@ -119,3 +121,22 @@ Route::get('/busquedas/guardadas', [BusquedaController::class, 'misBusquedas'])-
 Route::delete('/busquedas/{id}', [BusquedaController::class, 'eliminar'])->name('busqueda.eliminar');
 // Requerido por Laravel auth
 require __DIR__.'/auth.php';
+
+
+Route::prefix('guias-rapidas')->group(function () {
+    Route::get('/', function () {
+        return view('components.guias-rapidas.guias');
+    })->name('guias.rapidas');
+    
+    Route::get('/dueno', function () {
+        return view('components.guias-rapidas.dueno');
+    })->name('guias.dueno');
+    
+    Route::get('/veterinaria', function () {
+        return view('components.guias-rapidas.veterinaria');
+    })->name('guias.veterinaria');
+    
+    Route::get('/refugio', function () {
+        return view('components.guias-rapidas.refugio');
+    })->name('guias.refugio');
+});
