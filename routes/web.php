@@ -123,6 +123,7 @@ Route::delete('/busquedas/{id}', [BusquedaController::class, 'eliminar'])->name(
 require __DIR__.'/auth.php';
 
 
+
 Route::prefix('guias-rapidas')->group(function () {
     Route::get('/', function () {
         return view('components.guias-rapidas.guias');
